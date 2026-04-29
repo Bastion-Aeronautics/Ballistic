@@ -1,2 +1,2 @@
-# Bastion-Weapons-Depot
-Scripts for every weapons system ever
+# Bastion Weapons Depot
+LUA scripts for every weapon system and libraries for making more
