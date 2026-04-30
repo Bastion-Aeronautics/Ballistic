@@ -62,7 +62,9 @@ MAX_ROLL = 				property.getNumber("Max Roll") / 360 -- in degrees
 MAX_ROLL_TURN = 		property.getNumber("Max Roll Turn") / 360 -- in degrees, only used if Roll Control is true
 
 TERRAIN_FOLLOWING = 	property.getBool  ("Terrain Following")
-FOLLOW_HEIGHT = 		property.getNumber("Follow HEIGHT") -- in meters
+FOLLOW_HEIGHT = 		property.getNumber("Follow Height") -- in meters
+FOLLOW_GAIN = 		  property.getNumber("Follow Pitch Gain")
+MAX_FOLLOW_ANGLE = 	 property.getNumber("Max Follow Angle") * DEG
 
 MAX_ANGLE = 			property.getNumber("Max Angle") * DEG -- in degrees
 CRUISE_ALTITUDE = 		property.getNumber("Cruise Altitude")
@@ -135,7 +137,7 @@ function onTick()
 	if launched and elapsed > GUIDANCE_DELAY then guidance = true end
 
 	roll_setpoint = 0
-	roll_control = roll_setpoint - roll_tilt
+	roll_control = roll_tilt - roll_setpoint 
 
 	-- Terminal radar guidance
 	if radar_lock and terminal then
@@ -162,8 +164,7 @@ function onTick()
 				altitude_error = CRUISE_ALTITUDE - gps_y
 				terrain_error = FOLLOW_HEIGHT - terrain_sensor
 
-				combined_error = math.max(altitude_error, terrain_error)
-				pitch_setpoint = clamp(combined_error * ALTITUDE_GAIN, -MAX_ANGLE, MAX_ANGLE)
+				pitch_setpoint = math.max(clamp(altitude_error * ALTITUDE_GAIN,-MAX_ANGLE,MAX_ANGLE), clamp(terrain_error * FOLLOW_GAIN, -MAX_FOLLOW_ANGLE, MAX_FOLLOW_ANGLE))
 				
 			else
 				pitch_setpoint = clamp((CRUISE_ALTITUDE - gps_y) * ALTITUDE_GAIN, -MAX_ANGLE, MAX_ANGLE)
