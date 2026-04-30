@@ -15,7 +15,7 @@ function vec_length(A) return math.sqrt(A.x*A.x+A.y*A.y+A.z*A.z) end
 function vec_norm(A) return vec_length(A)~=0 and vec_div(A,vec_length(A)) or vec(0,0,0) end
 function vec_cross(A,B) return vec(A.y*B.z-A.z*B.y,A.z*B.x-A.x*B.z,A.x*B.y-A.y*B.x) end
 function vec_lerp(A,B,t) return vec_add(A,vec_scal(vec_sub(B,A),t)) end
-function to_local(vec) return vec(vec_dot(vec, local_x), vec_dot(vec, local_y), vec_dot(vec, local_z)) end
+function to_local(A) return vec(vec_dot(A, local_x), vec_dot(A, local_y), vec_dot(A, local_z)) end
 
 -- Property settings --
 
@@ -62,11 +62,11 @@ MAX_ROLL = 				property.getNumber("Max Roll") / 360 -- in degrees
 MAX_ROLL_TURN = 		property.getNumber("Max Roll Turn") / 360 -- in degrees, only used if Roll Control is true
 
 TERRAIN_FOLLOWING = 	property.getBool  ("Terrain Following")
-FOLLOW_ANGLE = 			property.getNumber("Follow Angle") / DEG -- in degrees
+FOLLOW_ANGLE = 			property.getNumber("Follow Angle") * DEG -- in degrees
 FOLLOW_MAX_DISTANCE = 	property.getNumber("Follow Max Distance")
 FOLLOW_MIN_DISTANCE = 	property.getNumber("Follow Min Distance")
 
-MAX_ANGLE = 			property.getNumber("Max Angle") / DEG -- in degrees
+MAX_ANGLE = 			property.getNumber("Max Angle") * DEG -- in degrees
 CRUISE_ALTITUDE = 		property.getNumber("Cruise Altitude")
 ALTITUDE_GAIN = 		property.getNumber("Altitude Gain")
 
@@ -85,6 +85,13 @@ state = 0
 active = false
 guidance = false
 terminal = false
+
+target = vec(0,0,0)
+towards = vec(0,0,0)
+
+yaw_control = 0
+pitch_control = 0
+roll_control = 0
 
 function onTick()
 	launched = input.getBool(1)
@@ -134,14 +141,15 @@ function onTick()
 
 	elseif GUIDANCE_MODE == 1 and guidance then
 
-		if (distance_to_target_horizontal < dive_distance) 	then state = 1 end
+		if (distance_to_target_horizontal < DIVE_DISTANCE) 	then state = 1 end
 		if (radar_lock and state == 1) 						then state = 2 end
 
 		if state == 0 then
-
 			pitch_setpoint = clamp((CRUISE_ALTITUDE - gps_y) * ALTITUDE_GAIN, -MAX_ANGLE, MAX_ANGLE)
-			local_offset = to_local(vec(global_offset.x, (math.tan(pitch_setpoint))*distance_to_target, global_offset.z))
+			towards = to_local(vec(global_offset.x, (math.tan(pitch_setpoint)) * distance_to_target_horizontal, global_offset.z))
 
+			yaw_control = math.atan(towards.x, towards.z)
+			pitch_control = math.atan(towards.y, towards.z)
 		elseif state == 1 then
 			terminal = true
 			yaw_control = 	math.atan(local_offset.x, local_offset.z)
