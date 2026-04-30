@@ -15,6 +15,7 @@ function vec_length(A) return math.sqrt(A.x*A.x+A.y*A.y+A.z*A.z) end
 function vec_norm(A) return vec_length(A)~=0 and vec_div(A,vec_length(A)) or vec(0,0,0) end
 function vec_cross(A,B) return vec(A.y*B.z-A.z*B.y,A.z*B.x-A.x*B.z,A.x*B.y-A.y*B.x) end
 function vec_lerp(A,B,t) return vec_add(A,vec_scal(vec_sub(B,A),t)) end
+function to_local(vec) return vec(vec_dot(vec, local_x), vec_dot(vec, local_y), vec_dot(vec, local_z)) end
 
 -- Property settings --
 
@@ -47,31 +48,52 @@ function vec_lerp(A,B,t) return vec_add(A,vec_scal(vec_sub(B,A),t)) end
 
 -- Altitude Trim: the angle the missile needs to hold to maintain altitude
 
-activation_delay = property.getNumber("Activation Delay") -- in ticks
-guidance_delay = property.getNumber("Guidance Delay")
+ACTIVATION_DELAY = property.getNumber("Activation Delay") -- in ticks
+GUIDANCE_DELAY = property.getNumber("Guidance Delay")
 
-guidance_mode = property.getNumber("Guidance Mode") -- 0 for direct, 1 for cruising, 2 for ballistic
+GUIDANCE_MODE = property.getNumber("Guidance Mode") -- 0 for direct, 1 for cruising, 2 for ballistic
 
-ejection_turn = property.getNumber("Ejection Turn") -- 0 for none, 1 for up, 2 for down
+EJECTION_TURN = property.getNumber("Ejection Turn") -- 0 for none, 1 for up, 2 for down
 
-roll_control = property.getBool("Roll Control")
-roll_gain = property.getNumber("Roll Gain")
-max_roll = property.getNumber("Max Roll") / DEG -- in degrees
+ROLL_CONTROL = property.getBool("Roll Control")
+ROLL_GAIN = property.getNumber("Roll Gain")
+MAX_ROLL = property.getNumber("Max Roll") / DEG -- in degrees
 
-terrain_following = property.getBool("Terrain Following")
-follow_angle = property.getNumber("Follow Angle") / DEG -- in degrees
-follow_max_distance = property.getNumber("Follow Max Distance")
-follow_min_distance = property.getNumber("Follow Min Distance")
+TERRAIN_FOLLOWING = property.getBool("Terrain Following")
+FOLLOW_ANGLE = property.getNumber("Follow Angle") / DEG -- in degrees
+FOLLOW_MAX_DISTANCE = property.getNumber("Follow Max Distance")
+FOLLOW_MIN_DISTANCE = property.getNumber("Follow Min Distance")
 
-max_angle = property.getNumber("Max Angle") / DEG -- in degrees
-cruise_altitude = property.getNumber("Cruise Altitude")
-altitude_gain = property.getNumber("Altitude Gain")
+MAX_ANGLE = property.getNumber("Max Angle") / DEG -- in degrees
+CRUISE_ALTITUDE = property.getNumber("Cruise Altitude")
+ALTITUDE_GAIN = property.getNumber("Altitude Gain")
 
-dive_distance = property.getNumber("Dive Distance")
+DIVE_DISTANCE = property.getNumber("Dive Distance")
 
-guidance_gain = property.getNumber("Guidance Gain")
+GUIDANCE_GAIN = property.getNumber("Guidance Gain")
 
-yaw_trim = property.getNumber("Yaw Trim")
-pitch_trim = property.getNumber("Pitch Trim")
+YAW_TRIM = property.getNumber("Yaw Trim")
+PITCH_TRIM = property.getNumber("Pitch Trim")
 
-altitude_trim = property.getNumber("Altitude Trim")
+ALTITUDE_TRIM = property.getNumber("Altitude Trim")
+
+function onTick()
+	gps_x, gps_y, gps_z = input.getNumber(1), input.getNumber(2), input.getNumber(3)
+
+	rx, ry, rz = input.getNumber(4), input.getNumber(5), input.getNumber(6)
+	cx, cy, cz = m.cos(rx), m.cos(ry), m.cos(rz)
+	sx, sy, sz = m.sin(rx), m.sin(ry), m.sin(rz)
+
+    -- Generates vectors representing the missile's local axes
+	local_x = vec(cy*cz,cy*sz,-sy)			            --right
+	local_y = vec(-cx*sz+sx*sy*cz,cx*cz+sx*sy*sz,sx*cy) --up
+	local_z = vec_cross(local_x,local_y) 	            --forward
+
+
+
+	local_offset = to_local(aimpoint)
+
+
+	yaw_to_target = m.atan(local_offset.x, local_offset.z)
+	pitch_to_target = m.atan(local_offset.y, local_offset.z)
+end
