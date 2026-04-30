@@ -172,6 +172,7 @@ function onTick()
 		if state == 0 then
 			towards = to_local(vec(global_offset.x, CRUISE_ALTITUDE, global_offset.z))
 
+			-- note: make 100 a changeable variable probably (this is the waypoint hit threshold)
 			if vec_length(towards) > 100 then
 				yaw_control = math.atan(towards.x, towards.z)
 				pitch_control = math.atan(towards.y, towards.z)
@@ -184,7 +185,7 @@ function onTick()
 			terminal = true
 			yaw_control = math.atan(local_offset.x, local_offset.z)
 			pitch_control = math.atan(local_offset.y, local_offset.z)
-			
+
 		end
 	end
 
