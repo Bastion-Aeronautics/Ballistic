@@ -82,6 +82,9 @@ ALTITUDE_TRIM = 		property.getNumber("Altitude Trim")
 
 TERMINAL_GAIN = 		property.getNumber("Terminal Gain")
 
+POP_UP_HEIGHT = 		property.getNumber("Pop-up Height")
+POP_UP_DISTANCE = 		property.getNumber("Pop-up Distance")
+
 elapsed = 0
 state = 0
 active = false
@@ -156,7 +159,6 @@ function onTick()
 	elseif GUIDANCE_MODE == 1 and guidance then
 
 		if (distance_to_target_horizontal < DIVE_DISTANCE) 	then state = 1 end
-		if (radar_lock and state == 1) 						then state = 2 end
 
 		if state == 0 then
 
@@ -183,23 +185,41 @@ function onTick()
 	-- Top Attack trajectory
 	elseif GUIDANCE_MODE == 2 and guidance then
 
-		if state == 0 then
-			towards = to_local(vec_sub(vec(target.x, target.y + CRUISE_ALTITUDE, target.z), gps))
+		if (distance_to_target_horizontal < POP_UP_DISTANCE)then state = 1 end
+		if (distance_to_target_horizontal < DIVE_DISTANCE)	then state = 2 end
 
-			if vec_length(towards) > CRUISE_ALTITUDE then
-				yaw_control = math.atan(towards.x, towards.z)
-				pitch_control = math.atan(towards.y, towards.z)
+		if state == 0 then
+
+			if TERRAIN_FOLLOWING then
+				altitude_error = CRUISE_ALTITUDE - gps_y
+				terrain_error = FOLLOW_HEIGHT - terrain_sensor
+
+				pitch_setpoint = math.max(clamp(altitude_error * ALTITUDE_GAIN,-MAX_ANGLE,MAX_ANGLE), clamp(terrain_error * FOLLOW_GAIN, -MAX_FOLLOW_ANGLE, MAX_FOLLOW_ANGLE))
+				
 			else
-				state = 1
+				pitch_setpoint = clamp((CRUISE_ALTITUDE - gps_y) * ALTITUDE_GAIN, -MAX_ANGLE, MAX_ANGLE)
 			end
 
+			towards = to_local(vec(global_offset.x, (math.tan(pitch_setpoint)) * distance_to_target_horizontal, global_offset.z))
+
+			yaw_control = math.atan(towards.x, towards.z)
+			pitch_control = math.atan(towards.y, towards.z)
+
 		elseif state == 1 then
+		
+			pitch_setpoint = clamp((target.y + POP_UP_HEIGHT - gps_y) * ALTITUDE_GAIN, -MAX_ANGLE, MAX_ANGLE)
 
+			towards = to_local(vec(global_offset.x, (math.tan(pitch_setpoint)) * distance_to_target_horizontal, global_offset.z))
+
+			yaw_control = math.atan(towards.x, towards.z)
+			pitch_control = math.atan(towards.y, towards.z)
+
+		elseif state == 2 then
 			terminal = true
-			yaw_control = math.atan(local_offset.x, local_offset.z)
+			yaw_control = 	math.atan(local_offset.x, local_offset.z)
 			pitch_control = math.atan(local_offset.y, local_offset.z)
-
 		end
+		
 	end
 
 
