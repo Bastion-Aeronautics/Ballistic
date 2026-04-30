@@ -57,7 +57,8 @@ EJECTION_TURN = 		property.getNumber("Ejection Turn") -- 0 for none, 1 for up, 2
 
 ROLL_CONTROL = 			property.getBool  ("Roll Control")
 ROLL_GAIN = 			property.getNumber("Roll Gain")
-MAX_ROLL = 				property.getNumber("Max Roll") / TAU -- in degrees
+MAX_ROLL = 				property.getNumber("Max Roll") / 360 -- in degrees
+MAX_ROLL_TURN = 		property.getNumber("Max Roll Turn") / 360 -- in degrees, only used if Roll Control is true
 
 TERRAIN_FOLLOWING = 	property.getBool  ("Terrain Following")
 FOLLOW_ANGLE = 			property.getNumber("Follow Angle") / DEG -- in degrees
@@ -100,8 +101,8 @@ function onTick()
 	pitch_tilt, roll_tilt = input.getNumber(15), input.getNumber(16)
 
 	rx, ry, rz = input.getNumber(4), input.getNumber(5), input.getNumber(6)
-	cx, cy, cz = m.cos(rx), m.cos(ry), m.cos(rz)
-	sx, sy, sz = m.sin(rx), m.sin(ry), m.sin(rz)
+	cx, cy, cz = math.cos(rx), math.cos(ry), math.cos(rz)
+	sx, sy, sz = math.sin(rx), math.sin(ry), math.sin(rz)
 
     -- Generates vectors representing the missile's local axes
 	local_x = vec(cy*cz,cy*sz,-sy)			            --right
@@ -121,7 +122,7 @@ function onTick()
 	if launched and elapsed > ACTIVATION_DELAY then active = true end
 	if launched and elapsed > GUIDANCE_DELAY then guidance = true end
 
-	roll_setpoint = clamp(yaw_control, -MAX_ROLL, MAX_ROLL)
+	roll_setpoint = 0
 	roll_control = roll_setpoint - roll_tilt
 
 	if GUIDANCE_MODE == 0 and guidance then
