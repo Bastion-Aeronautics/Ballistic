@@ -55,11 +55,11 @@ GUIDANCE_MODE = 		property.getNumber("Guidance Mode") -- 0 for direct, 1 for cru
 
 EJECTION_TURN = 		property.getNumber("Ejection Turn") -- 0 for none, 1 for up, 2 for down
 
-ROLL_CONTROL = 			property.getBool("Roll Control")
+ROLL_CONTROL = 			property.getBool  ("Roll Control")
 ROLL_GAIN = 			property.getNumber("Roll Gain")
-MAX_ROLL = 				property.getNumber("Max Roll") / DEG -- in degrees
+MAX_ROLL = 				property.getNumber("Max Roll") / TAU -- in degrees
 
-TERRAIN_FOLLOWING = 	property.getBool("Terrain Following")
+TERRAIN_FOLLOWING = 	property.getBool  ("Terrain Following")
 FOLLOW_ANGLE = 			property.getNumber("Follow Angle") / DEG -- in degrees
 FOLLOW_MAX_DISTANCE = 	property.getNumber("Follow Max Distance")
 FOLLOW_MIN_DISTANCE = 	property.getNumber("Follow Min Distance")
@@ -79,17 +79,23 @@ ROLL_TRIM = 			property.getNumber("Roll Trim")
 ALTITUDE_TRIM = 		property.getNumber("Altitude Trim")
 
 elapsed = 0
-aimpoint = vec(0,0,0)
+state = 0
 active = false
 guidance = false
 terminal = false
 
 function onTick()
-	target_x, target_y, target_z = input.getNumber(7), input.getNumber(8), input.getNumber(9)
-	target = vec(target_x, target_y, target_z)
+	launched = input.getBool(1)
+
+	radar_lock = input.getBool(2)
 
 	gps_x, gps_y, gps_z = input.getNumber(1), input.getNumber(2), input.getNumber(3)
 	gps = vec(gps_x, gps_y, gps_z)
+
+	target_x, target_y, target_z = input.getNumber(7), input.getNumber(8), input.getNumber(9)
+	target = vec(target_x, target_y, target_z)
+
+	radar_x, radar_y = input.getNumber(10), input.getNumber(11)
 
 	pitch_tilt, roll_tilt = input.getNumber(15), input.getNumber(16)
 
@@ -103,24 +109,51 @@ function onTick()
 	local_z = vec_cross(local_x,local_y) 	            --forward
 
 	global_offset = vec_sub(target, gps)
+	global_offset_norm = vec_norm(global_offset)
 
 	distance_to_target = vec_length(global_offset)
 	distance_to_target_horizontal = vec_length(vec(global_offset.x, 0, global_offset.z))
 
-	local_offset = to_local(aimpoint)
+	local_offset = to_local(global_offset)
 
-	yaw_to_target = m.atan(local_offset.x, local_offset.z)
-	pitch_to_target = m.atan(local_offset.y, local_offset.z)
 
-	-- Guidance logic
+	-- Guidance logic --
+	if launched and elapsed > ACTIVATION_DELAY then active = true end
+	if launched and elapsed > GUIDANCE_DELAY then guidance = true end
+
+	roll_setpoint = clamp(yaw_control, -MAX_ROLL, MAX_ROLL)
+	roll_control = roll_setpoint - roll_tilt
+
 	if GUIDANCE_MODE == 0 and guidance then
-		yaw_control = yaw_to_target
-		pitch_control = pitch_to_target
+		yaw_control = math.atan(local_offset.x, local_offset.z)
+		pitch_control = math.atan(local_offset.y, local_offset.z)
+
 	elseif GUIDANCE_MODE == 1 and guidance then
 
-	elseif GUIDANCE_MODE == 2 and guidance then
+		if (distance_to_target_horizontal < dive_distance) 	then state = 1 end
+		if (radar_lock and state == 1) 						then state = 2 end
 
-	end
+		if state == 0 then
+
+			pitch_setpoint = clamp((CRUISE_ALTITUDE - gps_y) * ALTITUDE_GAIN, -MAX_ANGLE, MAX_ANGLE)
+			local_offset = to_local(vec(global_offset.x, (math.tan(pitch_setpoint))*distance_to_target, global_offset.z))
+
+		elseif state == 1 then
+			terminal = true
+			yaw_control = 	math.atan(local_offset.x, local_offset.z)
+			pitch_control = math.atan(local_offset.y, local_offset.z)
+		
+		elseif state == 2 then
+			yaw_control = 	radar_x
+			pitch_control = radar_y
+
+		end
+
+	-- elseif GUIDANCE_MODE == 2 and guidance then
+		-- oh no I havent done that part yet
+	-- end
+
+	-- End of guidance logic --
 
 	output.setNumber(1, yaw_control 	* GUIDANCE_GAIN 	+ YAW_TRIM	)
 	output.setNumber(2, pitch_control 	* GUIDANCE_GAIN 	+ PITCH_TRIM)
@@ -129,4 +162,6 @@ function onTick()
 	output.setBool(1, active)
 	output.setBool(2, guidance)
 	output.setBool(3, terminal)
+
+	elapsed = launched and elapsed + 1 or 0
 end
