@@ -53,7 +53,8 @@ GUIDANCE_DELAY = 		property.getNumber("Guidance Delay")
 
 GUIDANCE_MODE = 		property.getNumber("Guidance Mode") -- 0 for direct, 1 for cruising, 2 for ballistic
 
-EJECTION_TURN = 		property.getNumber("Ejection Turn") -- 0 for none, 1 for up, 2 for down
+EJECTION_TURN = 		property.getNumber("Ejection Turn") -- 0 for none, 1 for up, -1 for down
+EJECTION_DURATION = 	property.getNumber("Ejection Duration") -- in ticks, how long to hold the ejection turn
 
 ROLL_CONTROL = 			property.getBool  ("Roll Control")
 ROLL_GAIN = 			property.getNumber("Roll Gain")
@@ -93,8 +94,10 @@ function onTick()
 	gps_x, gps_y, gps_z = input.getNumber(1), input.getNumber(2), input.getNumber(3)
 	gps = vec(gps_x, gps_y, gps_z)
 
-	target_x, target_y, target_z = input.getNumber(7), input.getNumber(8), input.getNumber(9)
-	target = vec(target_x, target_y, target_z)
+	if input.getNumber(7) ~= 0 then
+		target_x, target_y, target_z = input.getNumber(7), input.getNumber(8), input.getNumber(9)
+		target = vec(target_x, target_y, target_z)
+	end
 
 	radar_x, radar_y = input.getNumber(10), input.getNumber(11)
 
@@ -153,6 +156,11 @@ function onTick()
 	-- elseif GUIDANCE_MODE == 2 and guidance then
 		-- oh no I havent done that part yet
 	-- end
+
+
+	if EJECTION_TURN ~= 0 and elapsed < EJECTION_DURATION then
+		pitch_control = EJECTION_TURN
+	end
 
 	-- End of guidance logic --
 
