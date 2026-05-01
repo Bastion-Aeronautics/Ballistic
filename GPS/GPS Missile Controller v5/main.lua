@@ -65,6 +65,7 @@ TERRAIN_FOLLOWING = 	property.getBool  ("Terrain Following")
 FOLLOW_HEIGHT = 		property.getNumber("Follow Height") -- in meters
 FOLLOW_GAIN = 		  property.getNumber("Follow Pitch Gain")
 MAX_FOLLOW_ANGLE = 	 property.getNumber("Max Follow Angle") * DEG
+MIN_FOLLOW_ANGLE = 	 property.getNumber("Min Follow Angle") * DEG
 
 MAX_ANGLE = 			property.getNumber("Max Angle") * DEG -- in degrees
 CRUISE_ALTITUDE = 		property.getNumber("Cruise Altitude")
