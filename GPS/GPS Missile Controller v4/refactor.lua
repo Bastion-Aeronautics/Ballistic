@@ -175,9 +175,9 @@ function onTick()
 				altitude_error = CRUISE_ALTITUDE - gps_y
 				terrain_error = FOLLOW_HEIGHT - terrain_sensor
 
-				pitch_setpoint = math.max(clamp(altitude_error * ALTITUDE_GAIN,-MAX_ANGLE,MAX_ANGLE), clamp(terrain_error * FOLLOW_GAIN, -MAX_FOLLOW_ANGLE, MAX_FOLLOW_ANGLE))
-				
 				if terrain_error > altitude_error then debug_state = 7 end
+
+				pitch_setpoint = math.max(clamp(altitude_error * ALTITUDE_GAIN,(-10*DEG),MAX_ANGLE), clamp(terrain_error * FOLLOW_GAIN, -MAX_FOLLOW_ANGLE, MAX_FOLLOW_ANGLE))
 				
 			else
 				pitch_setpoint = clamp((CRUISE_ALTITUDE - gps_y) * ALTITUDE_GAIN, -MAX_ANGLE, MAX_ANGLE)
@@ -212,7 +212,7 @@ function onTick()
 
 				if terrain_error > altitude_error then debug_state = 7 end
 
-				pitch_setpoint = math.max(clamp(altitude_error * ALTITUDE_GAIN,(-5*DEG),MAX_ANGLE), clamp(terrain_error * FOLLOW_GAIN, -MAX_FOLLOW_ANGLE, MAX_FOLLOW_ANGLE))
+				pitch_setpoint = math.max(clamp(altitude_error * ALTITUDE_GAIN,(-10*DEG),MAX_ANGLE), clamp(terrain_error * FOLLOW_GAIN, -MAX_FOLLOW_ANGLE, MAX_FOLLOW_ANGLE))
 				
 			else
 				pitch_setpoint = clamp((CRUISE_ALTITUDE - gps_y) * ALTITUDE_GAIN, -MAX_ANGLE, MAX_ANGLE)
