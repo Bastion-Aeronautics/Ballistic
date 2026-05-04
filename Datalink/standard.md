@@ -5,3 +5,6 @@
 - 2:
 
 **Number Channels**
+- 1: transmit frequency
+- 2-4: GPS coordinate of vehicle
+- 5: Type of vehicle
