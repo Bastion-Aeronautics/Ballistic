@@ -52,7 +52,7 @@ def solve(dist, height):
             return a, t, True   # Return angle, time, and success flag
 
 
-        print(f"Time: {t:.0f} ticks, Y: {y:.3f}, Angle: {math.degrees(a):.4f} degrees")  # Debug output
+        print(f"ToF: {t*60:.0f} ticks, Y: {y:.3f}, Angle: {math.degrees(a):.4f} degrees")  # Debug output
 
         # Adjust angle using atan approximation for correction
         a = a - math.atan2(y - yT, x)
@@ -117,8 +117,8 @@ def on_tick(dist, height):
 # Example usage
 if __name__ == "__main__":
     # Test the ballistic calculator
-    test_distance = 800
-    test_height = -300  # Assuming target is at the same height as the shooter
+    test_distance = 2000
+    test_height = 100  # Assuming target is at the same height as the shooter
 
     print("\n\n")
     if test_height >= 0:
@@ -131,8 +131,8 @@ if __name__ == "__main__":
 
     if success:
         print()
-        print(f"Firing angle: {drop*(180/math.pi):.4f} degrees")
-        print(f"Time to target: {result_time:.4f} seconds")
+        print(f"Calculated firing angle: +{drop*(180/math.pi):.3f} degrees")
+        print(f"Approximate time to target: {result_time:.3f} seconds")
     else:
         print()
         print(f"Failed to find solution for distance {test_distance}")
