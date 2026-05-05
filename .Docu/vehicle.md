@@ -7,7 +7,6 @@ Armour: completely fucking broken after the update<br>
 Gun: 120mm with some random workshop FCS
 
 
-
 ## IFV / SPAA
 
 ### AA-134 Bandsaw
@@ -15,7 +14,11 @@ Armour: light calibers<br>
 Gun: 4 30mm autocannons with mouse aim<br>
 also equipped with R-5 Anti air missiles
 
+
 ## Aircraft
+
+### AP-3 Mantis
+Light COIN aircraft that has recently been upgraded with more carrying capacity and rudimentary GPS missile compatibility
 
 ### CV-5 Kestrel
 The Kestrel is a light cargo aircraft capable of carrying decently sized loads such as palletes and small vehicles
