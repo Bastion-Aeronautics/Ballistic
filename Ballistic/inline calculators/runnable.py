@@ -1,19 +1,13 @@
-"""
-Ballistic Calculator v1
-This script calculates the firing angle for a projectile to hit a target at a given distance,
-taking into account gravity and air resistance (drag). It's designed for use in a game or simulation
-environment, likely Stormworks, where projectiles follow ballistic trajectories.
-"""
-
 import math
+import time as t
 
 # Bullet parameters
-muzzle_velocity = 800          # Initial velocity of the projectile (units per second)
-drag = 0.002 * 60              # Drag coefficient, scaled by 60 (likely for per-tick simulation)
-lifeSpan = 1500 / 60           # Maximum lifespan of the projectile in seconds (converted from ticks)
+muzzle_velocity = 800          # Initial velocity of the projectile
+drag = 0.002 * 60              # Drag coefficient, scaled by 60
+lifeSpan = 1500 / 60           # Maximum lifespan of the projectile in seconds
 
-gravity = 30                   # Gravity acceleration (units per second squared)
-error = 0.001                    # Error tolerance for the solution (acceptable vertical error in units)
+gravity = 30                   # Gravity acceleration
+error = 0.001                    # Error tolerance for the solution
 
 # Global variables for output
 offset = 0
@@ -21,16 +15,7 @@ time = 0
 
 
 def solve(dist, height):
-    """
-    Function to solve for the firing angle given a target distance.
-    Uses an iterative method to find the angle where the projectile hits the target.
     
-    Args:
-        dist: Horizontal distance to target
-    
-    Returns:
-        tuple: (angle in radians, time of flight, success flag)
-    """
     x = dist                    # Horizontal distance to target
     yT = height                      # Target vertical position (assuming flat ground)
 
@@ -52,7 +37,7 @@ def solve(dist, height):
             return a, t, True   # Return angle, time, and success flag
 
 
-        print(f"ToF: {t*60:.0f} ticks, Y: {y:.3f}, Angle: {math.degrees(a):.4f} degrees")  # Debug output
+        # print(f"ToF: {t*60:.0f} ticks, Y: {y:.3f}, Angle: {math.degrees(a):.4f} degrees")  # Debug output
 
         # Adjust angle using atan approximation for correction
         a = a - math.atan2(y - yT, x)
@@ -63,46 +48,17 @@ def solve(dist, height):
 
 
 def get_y(v, t):
-    """
-    Function to calculate vertical position at time t with initial vertical velocity v.
-    Accounts for gravity and drag using the equation of motion.
     
-    Args:
-        v: Initial vertical velocity
-        t: Time
-    
-    Returns:
-        float: Vertical position
-    """
     return -gravity * t / drag + (gravity / drag + v) * (1 - math.exp(-drag * t)) / drag
 
 
 def get_time(v, x):
-    """
-    Function to calculate time to reach horizontal distance x with initial horizontal velocity v.
-    Solves the drag equation for time.
     
-    Args:
-        v: Initial horizontal velocity
-        x: Horizontal distance
-    
-    Returns:
-        float: Time to reach distance x
-    """
     return -math.log(1 - drag * x / v) / drag
 
 
 def on_tick(dist, height):
-    """
-    Main tick function, called every simulation tick.
-    
-    Args:
-        dist: Current target distance
-        height: Current target height
-    
-    Returns:
-        tuple: (offset, time, success flag)
-    """
+
     global offset, time
     
     drp, t, ok = solve(dist, height)  # Solve for drop angle and success flag
@@ -137,4 +93,21 @@ if __name__ == "__main__":
         print()
         print(f"Failed to find solution for distance {test_distance}")
 
+    print("")
+
+    input("Press Enter to run performance test")
+
+    start_time = t.time()
+
+    print("\n")
+    print("\033[2mRunning tests\033[0m")
+
+    for distance in range(100, 5001):
+        for height in range(-100, 100):
+            result_offset, result_time, success, drop = on_tick(distance, height)
+
+    end_time = t.time()
+    print("")
+    print(f"Ran 1 million calculation cycles in {end_time - start_time:.2f} seconds")
+    print(f"\033[1m\033[32mAverage cycle time: {(end_time - start_time) / 1000000 * 1000000:.2f}us\033[0m")
     print("\n")
