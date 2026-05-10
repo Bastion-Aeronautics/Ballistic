@@ -8,7 +8,6 @@ Leading to major flaws such as awful range and the inability to distinguish chaf
 A low profile short range missile that can be used against ground targets and slow moving aircraft
 
 <b>R-3</b><br>
-
 <b>R-4</b><br>
 <b>R-5</b><br>
 <b>R-5x</b><br>
