@@ -16,11 +16,10 @@ def plot_shit(trajectory0, trajectory1):
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
+
     
-    ax.set_box_aspect((1, 1, 1))
-    
-    ax.plot(x0, y0, z0, label='Aridistani Shahed')
-    ax.plot(x1, y1, z1, label='SLAM IR Anti Air Missile')
+    ax.plot(x0, y0, z0, label='ALQM-5 Terrain Skimming Testbed')
+    ax.plot(x1, y1, z1, label='Interceptor')
     ax.set_xlabel('GPS X')
     ax.set_ylabel('GPS Y')
     ax.set_zlabel('Altitude')
