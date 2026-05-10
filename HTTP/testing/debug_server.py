@@ -39,7 +39,7 @@ def monitor_timeout():
 
 @app.route('/updatePosition') # This function can be called to update the position
 def updatePosition():
-    global missile_return, missile_hit, last_update_time
+    global missile_return, missile_hit, last_update_time, missile_launched
     missile_launched = True
     missile_return = True
     current_x = request.args.get('x')
