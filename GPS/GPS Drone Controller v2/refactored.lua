@@ -94,7 +94,7 @@ function onTick()
 
     -- (Bool 7) Self destruct (optional)
     if (input.getBool(7) and selected) then
-    	output.setBool(2, true)
+		output.setBool(2, true)
     end
 
     -- (Bool 8) Select all drones
@@ -105,67 +105,67 @@ function onTick()
     end
 
 	if launched then
-    	-- Guidance code
-    	deltaX = targetX - currentX -- GPS X
-    	deltaY = targetY - currentY -- Altitude
-    	deltaZ = targetZ - currentZ -- GPS Y
+		-- Guidance code
+		deltaX = targetX - currentX -- GPS X
+		deltaY = targetY - currentY -- Altitude
+		deltaZ = targetZ - currentZ -- GPS Y
 
-    	targetHeading = (((((math.atan(deltaX,deltaZ)/pi2)*-2)+1)%2)-1)/2
+		targetHeading = (((((math.atan(deltaX,deltaZ)/pi2)*-2)+1)%2)-1)/2
 
-    	GPSdistanceToTarget = math.sqrt(deltaX*deltaX + deltaZ*deltaZ)
-    	realDistanceToTarget = math.sqrt(deltaX*deltaX + deltaY*deltaY + deltaZ*deltaZ)
+		GPSdistanceToTarget = math.sqrt(deltaX*deltaX + deltaZ*deltaZ)
+		realDistanceToTarget = math.sqrt(deltaX*deltaX + deltaY*deltaY + deltaZ*deltaZ)
 
-    	diveAngleToTarget = -math.atan(deltaY/GPSdistanceToTarget)/pi2
+		diveAngleToTarget = -math.atan(deltaY/GPSdistanceToTarget)/pi2
 
-    	altitudeHold = Pc(altitudeSetpoint, currentY, altitudeP)
+		altitudeHold = Pc(altitudeSetpoint, currentY, altitudeP)
 
 
-    	---- Guidance logic ----
+		---- Guidance logic ----
 
-    	altitudeSetpoint = math.max(cruiseAltitude, (terrainHeight + avoidHeight)) -- Don't go below 50m above terrain
+		altitudeSetpoint = math.max(cruiseAltitude, (terrainHeight + avoidHeight)) -- Don't go below 50m above terrain
 
-    	pitchSetpoint = clamp(altitudeHold, -pitchMax, pitchMax)
-    	headingSetpoint = targetHeading
-    	rollSetpoint = -clamp((((compass-headingSetpoint)%1+1.5)%1-0.5)/4, -rollMax, rollMax)
+		pitchSetpoint = clamp(altitudeHold, -pitchMax, pitchMax)
+		headingSetpoint = targetHeading
+		rollSetpoint = -clamp((((compass-headingSetpoint)%1+1.5)%1-0.5)/4, -rollMax, rollMax)
 
-    	if GPSdistanceToTarget < diveDistance and armed then
-        	mode = 2
-    	end
+		if GPSdistanceToTarget < diveDistance and armed then
+			mode = 2
+		end
 
-    	if locked and not noRadar then
-        	mode = 3
+		if locked and not noRadar then
+			mode = 3
 		end
 
 
-    	-- Cascade control to fins
-    	yawDifference = ((compass-headingSetpoint)%1+1.5)%1-0.5
+		-- Cascade control to fins
+		yawDifference = ((compass-headingSetpoint)%1+1.5)%1-0.5
 
-    	if mode == 1 then
-        	yaw = Pc(0, yawDifference, -yawP)
-        	pitch = Pc(pitchSetpoint, tiltX, pitchP)
-        	roll = Pc(rollSetpoint, tiltY, -rollP)
-    	end
+		if mode == 1 then
+			yaw = Pc(0, yawDifference, -yawP)
+			pitch = Pc(pitchSetpoint, tiltX, pitchP)
+			roll = Pc(rollSetpoint, tiltY, -rollP)
+		end
 
-    	if mode == 2 then
-        	yaw = Pc(0, yawDifference, -yawP)
-       	 pitch = Pc(-diveAngleToTarget, tiltX, pitchP)
-       	 roll = Pc(rollSetpoint, tiltY, -rollP)
-    	end
+		if mode == 2 then
+			yaw = Pc(0, yawDifference, -yawP)
+			pitch = Pc(-diveAngleToTarget, tiltX, pitchP)
+			roll = Pc(rollSetpoint, tiltY, -rollP)
+		end
 
-    	if mode == 3 then
-     	   yaw = radarYaw*gain
-     	   pitch = radarPitch*gain
-    	end
+		if mode == 3 then
+			yaw = radarYaw*gain
+			pitch = radarPitch*gain
+		end
 
-    	-- Yaw and pitch are first so output composite can be fed directly into missile fin
-    	output.setNumber(1,clamp(yaw,-1,1)) -- Right +
-    	output.setNumber(2,clamp(pitch,-1,1)) -- Up +
-    	output.setNumber(3,clamp(roll,-1,1)) -- Right +
+		-- Yaw and pitch are first so output composite can be fed directly into missile fin
+		output.setNumber(1,clamp(yaw,-1,1)) -- Right +
+		output.setNumber(2,clamp(pitch,-1,1)) -- Up +
+		output.setNumber(3,clamp(roll,-1,1)) -- Right +
 
-    	-- Datalink feedback
-    	output.setNumber(4, currentX)
-    	output.setNumber(5, currentY)
-    	output.setNumber(6, currentZ)
+		-- Datalink feedback
+		output.setNumber(4, currentX)
+		output.setNumber(5, currentY)
+		output.setNumber(6, currentZ)
 
 		output.setNumber(14, GPSdistanceToTarget)
 		
@@ -179,7 +179,7 @@ function onTick()
 
 		output.setBool(1, launched)
 		
-		if (altitudeSetpoint - currentY &gt; 50) and (mode == 1) then
+		if (altitudeSetpoint - currentY > 50) and (mode == 1) then
 			output.setNumber(7, 0)
 		else
 			output.setNumber(7, mode)

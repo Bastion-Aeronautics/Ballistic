@@ -1,0 +1,10 @@
+input = {}
+output = {}
+async = {}
+property = {}
+property.getNumber = function(name) return 0 end
+property.getBool = function(name) return false end
+input.getNumber = function(channel) return 0 end
+output.setNumber = function(channel, value) end
+input.getBool = function(channel) return false end
+output.setBool = function(channel, value) end

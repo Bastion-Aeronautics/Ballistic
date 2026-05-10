@@ -63,9 +63,9 @@ MAX_ROLL_TURN = 		property.getNumber("Max Roll Turn") / 360 -- in degrees, only 
 
 TERRAIN_FOLLOWING = 	property.getBool  ("Terrain Following")
 FOLLOW_HEIGHT = 		property.getNumber("Follow Height") -- in meters
-FOLLOW_GAIN = 		  property.getNumber("Follow Pitch Gain")
-MAX_FOLLOW_ANGLE = 	 property.getNumber("Max Follow Angle") * DEG
-MIN_FOLLOW_ANGLE = 	 property.getNumber("Min Follow Angle") * DEG
+FOLLOW_GAIN = 		  	property.getNumber("Follow Pitch Gain")
+MAX_FOLLOW_ANGLE = 	 	property.getNumber("Max Follow Angle") * DEG
+MIN_FOLLOW_ANGLE = 	 	property.getNumber("Min Follow Angle") * DEG
 
 MAX_ANGLE = 			property.getNumber("Max Angle") * DEG -- in degrees
 CRUISE_ALTITUDE = 		property.getNumber("Cruise Altitude")
@@ -87,6 +87,13 @@ POP_UP_HEIGHT = 		property.getNumber("Pop-up Height")
 POP_UP_DISTANCE = 		property.getNumber("Pop-up Distance")
 
 MAX_DEFLECTION = 		property.getNumber("Max Deflection")
+
+HTTP_DEBUG = 			property.getBool("HTTP Debug")
+DEBUG_PORT = 			property.getNumber("Debug Port")
+
+HTTP_COOLDOWN = 10
+
+HTTP_cooldown = HTTP_COOLDOWN
 
 elapsed = 0
 state = 0
@@ -275,5 +282,17 @@ function onTick()
 	output.setNumber(4, debug_state)
 	-- 0: waiting 1: ejecting 2: cruising 3: popping up 4: diving 5: direct 6: terminal 7: terrain
 
+
+	-- HTTP Debugging  system --
+	if HTTP_DEBUG and HTTP_cooldown == 0 and active then
+		async.httpGet(DEBUG_PORT, '/updatePosition?x='..gps_x..'&y='..gps_y..'&z='..gps_z)
+		HTTP_cooldown = HTTP_COOLDOWN
+	end
+
+	HTTP_cooldown = HTTP_cooldown - 1
 	elapsed = launched and elapsed + 1 or 0
+end
+
+function httpReply(port, request_body, response_body)
+    -- nothing for now
 end

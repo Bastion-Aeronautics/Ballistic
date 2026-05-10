@@ -13,4 +13,7 @@ function onTick()
             output.setNumber(1, radarX)
             output.setNumber(2, radarY)
         end
+
+        lastLocked = locked
+    end
 end

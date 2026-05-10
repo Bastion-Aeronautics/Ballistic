@@ -1,3 +1,5 @@
+m = math
+
 tau=2*m.pi
 IN=input.getNumber
 ON=output.setNumber
@@ -59,7 +61,7 @@ function onTick()
 	local_range = vec(vec_dot(guide, Xn), vec_dot(guide, Yn), vec_dot(guide, Zn)) 
 	--project range into local frame, so coords are now expressed as right, up, fwd
 	
-	if distance_to_target &lt; dive_distance then
+	if distance_to_target < dive_distance then
 		state = 1
 	else
 		state = 0
