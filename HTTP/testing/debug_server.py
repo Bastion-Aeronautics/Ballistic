@@ -1,6 +1,7 @@
 # Creating a Web server using Python and Flask
 from flask import Flask, request
 import logging
+from graphing import plot_shit
 app = Flask('app')
 
 trajectory = [] # This list will store the trajectory points
