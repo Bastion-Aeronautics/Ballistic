@@ -91,6 +91,10 @@ MAX_DEFLECTION = 		property.getNumber("Max Deflection")
 HTTP_DEBUG = 			property.getBool("HTTP Debug")
 DEBUG_PORT = 			property.getNumber("Debug Port")
 
+HTTP_COOLDOWN = 10
+
+HTTP_cooldown = HTTP_COOLDOWN
+
 elapsed = 0
 state = 0
 active = false
@@ -280,11 +284,12 @@ function onTick()
 
 
 	-- HTTP Debugging  system --
-	if HTTP_DEBUG then
+	if HTTP_DEBUG and HTTP_cooldown == 0 then
 		async.httpGet(DEBUG_PORT, '/updatePosition?x='..gps_x..'&y='..gps_y..'&z='..gps_z)
+		HTTP_cooldown = HTTP_COOLDOWN
 	end
 
-
+	HTTP_cooldown = HTTP_cooldown - 1
 	elapsed = launched and elapsed + 1 or 0
 end
 
