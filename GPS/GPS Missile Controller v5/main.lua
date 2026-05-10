@@ -284,7 +284,7 @@ function onTick()
 
 
 	-- HTTP Debugging  system --
-	if HTTP_DEBUG and HTTP_cooldown == 0 then
+	if HTTP_DEBUG and HTTP_cooldown == 0 and active then
 		async.httpGet(DEBUG_PORT, '/updatePosition?x='..gps_x..'&y='..gps_y..'&z='..gps_z)
 		HTTP_cooldown = HTTP_COOLDOWN
 	end
