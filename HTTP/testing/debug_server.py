@@ -3,8 +3,24 @@ from flask import Flask, request
 import logging
 import time
 import threading
+import matplotlib.pyplot as plt
 
-from graphing import plot_shit
+def plot_shit(trajectory):
+    x = [p[0] for p in trajectory]
+    z = [p[1] for p in trajectory]
+    y = [p[2] for p in trajectory]
+
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    ax.plot(x, y, z)
+    ax.set_xlabel('GPS X')
+    ax.set_ylabel('GPS Y')
+    ax.set_zlabel('Altitude')
+    plt.savefig("graph.png")
+    plt.show()
+
 app = Flask('app')
 
 trajectory = [] # This list will store the trajectory points
