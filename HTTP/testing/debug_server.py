@@ -4,6 +4,7 @@ import logging
 import time
 import threading
 
+from graphing import plot_shit
 app = Flask('app')
 
 trajectory = [] # This list will store the trajectory points
@@ -31,7 +32,7 @@ def updatePosition():
     last_update_time = time.time()
     missile_hit = False  # Reset on new update
     return "OK"
-
+plot_shit(trajectory)
 logging.getLogger('werkzeug').disabled = True # Disable Flask's default logging
 
 # Start the timeout monitor thread
