@@ -19,6 +19,9 @@ function vec_lerp(A,B,t) return vec_add(A,vec_scal(vec_sub(B,A),t)) end
 
 -- Property Settings --
 
+
+-- LAUNCHING --
+
 -- Activation delay:    TICKS to wait after launch to activate booster
 -- Guidance delay:      TICKS to wait after launch to allow guidance
 
@@ -26,9 +29,20 @@ function vec_lerp(A,B,t) return vec_add(A,vec_scal(vec_sub(B,A),t)) end
 -- Ejection Duration:   TICKS to perform ejection turning
 
 
+-- GUIDANCE --
+
 -- Guidance:            0. Direct    1. Cruising
+-- Guidance Law:        0. Direct    1. Proportional Navigation (PN)
+-- Guidance Factor:     Multiplier for guidance control signals (useful for PN tuning)
 
 
+-- PATHING --
+
+-- Cruise Mode:         False: Absolute altitude    True: Relative to target Y
+-- Cruise Altitude:     Altitude to maintain when cruising
+
+-- MAX Angle:           Maximum pitch angle allowed for altitude controller
+-- MIN Angle:           Minimum pitch angle allowed for altitude controller
 
 
 -- Self Tune: False: Normal, go to target as usual    True: Run self tuning routine
