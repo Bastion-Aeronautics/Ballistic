@@ -68,6 +68,7 @@ function onTick()
 
     launched = input.getBool(1)
 
+    locked = input.getBool(2) -- Will be handled with external radar controller
 
     current_X, current_Y, current_Z = input.getNumber(1), input.getNumber(2), input.getNumber(3)
 
