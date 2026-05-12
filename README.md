@@ -1,2 +1,2 @@
-# Bastion Weapons Depot
-AWFUL lua scripts for HORRIBLE weapons systems
+# Ballistics Calculators
+Inline ballistics calculators, GPS artillery systems, CIWS
